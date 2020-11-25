@@ -1,7 +1,9 @@
 from flask import Flask, redirect, render_template, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Meal, Calendar, List
+from forms import UserLoginForm, UserRegisterForm
 from secrets import key
+from sqlalchemy.exc import IntegrityError
 import os
 
 app = Flask(__name__)
@@ -20,3 +22,27 @@ toolbar = DebugToolbarExtension(app)
 @app.route('/')
 def home_page():
     return render_template('index.html')
+
+@app.route('/register', methods=["GET", "POST"])
+def register_user():
+    form = UserRegisterForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+        email = form.email.data
+        new_user = User.register(username, password, first_name, last_name, email)
+        db.session.add(new_user)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            form.username.errors.append('Username taken. Please pick another')
+            return render_template("register.html", form=form)
+            
+        session['user_id'] = new_user.id
+        flash("Welcome! Successfully Created Your Account!", "success")
+        return redirect('/')
+    else:
+
+        return render_template('register.html', form=form)
