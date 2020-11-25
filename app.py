@@ -23,6 +23,7 @@ toolbar = DebugToolbarExtension(app)
 def home_page():
     return render_template('index.html')
 
+################## USER LOGIN, REGISTER, LOGOUT ##################
 @app.route('/register', methods=["GET", "POST"])
 def register_user():
     form = UserRegisterForm()
@@ -46,3 +47,36 @@ def register_user():
     else:
 
         return render_template('register.html', form=form)
+
+@app.route('/login', methods=["GET", "POST"])
+def login_user():
+    form = UserLoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        user = User.login(username, password)
+        if user:
+            flash(f"Welcome back {user.username}!", "success")
+            session['user_id'] = user.id
+            return redirect(f'/users/{user.id}')
+        else:
+            form.username.errors = ['Invalid username/password']
+
+    return render_template('login.html', form=form)
+
+@app.route('/logout')
+def logout_user():
+    session.pop('user_id')
+    flash("Successfully logged out", "primary")
+    return redirect('/')
+
+
+################## USER PAGES ##################
+@app.route('/users/<int:user_id>')
+def user_page(user_id):
+    if 'user_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/login')
+    user = User.query.get_or_404(user_id)
+    if user.id == session['user_id']:
+        return render_template("user.html", user=user)
