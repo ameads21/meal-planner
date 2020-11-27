@@ -22,13 +22,13 @@ class User(db.Model):
     email = db.Column(db.Text, nullable=False)
 
     @classmethod
-    def register(cls, username, pwd, first_name, last_name, email):
+    def register(cls, user):
         """Register the user with hashed password"""
 
-        hashed = bcrypt.generate_password_hash(pwd)
+        hashed = bcrypt.generate_password_hash(user.password)
         hashed_utf8 = hashed.decode('utf8')
 
-        return cls(username=username, password=hashed_utf8, first_name=first_name, last_name=last_name, email=email)
+        return cls(username=user.username, password=hashed_utf8, first_name=user.first_name, last_name=user.last_name, email=user.email)
 
     @classmethod
     def login(cls, username, pwd):

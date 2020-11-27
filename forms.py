@@ -13,3 +13,8 @@ class UserRegisterForm(FlaskForm):
     first_name = StringField("First Name", validators=[InputRequired(message="This form is required!")])
     last_name = StringField("Last Name", validators=[InputRequired(message="This form is required!")])
     email = StringField('E-mail', validators=[InputRequired(), Email()])
+
+class UserEditForm(FlaskForm):
+    first_name = StringField("First Name")
+    last_name = StringField("Last Name")
+    email = StringField('E-mail')

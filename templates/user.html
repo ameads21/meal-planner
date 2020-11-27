@@ -3,4 +3,8 @@
 {%block content%}
 <h1>{{user.first_name}} {{user.last_name}}</h1>
 <a href="/logout">Logout</a>
+<form action="/users/{{user.id}}/delete" method="POST">
+<button>Delete</button>
+</form>
+<a href="/users/{{user.id}}/edit">Edit</a>
 {%endblock%}
