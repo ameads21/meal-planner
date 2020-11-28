@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, session, flash, g
+from flask import Flask, redirect, render_template, session, flash, g, request
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Meal, Calendar, List
 from forms import UserLoginForm, UserRegisterForm, UserEditForm
@@ -149,4 +149,29 @@ def user_edit(user_id):
     
 
     
-    
+################## NAVBAR LINK/SEARCH ##################
+
+@app.route('/search', methods=["POST"])
+def search_engine():
+    search_input = request.form['search']
+    flash (f"Search results for {search_input}")
+    return redirect('/')
+
+@app.route('/users/<int:user_id>/calendar')
+def meal_calendar(user_id):
+    user = User.query.get_or_404(user_id)
+    check_user = do_user_check(user)
+    return render_template("user_meal_calendar.html", user=user)
+
+
+@app.route('/users/<int:user_id>/saved-meals')
+def saved_meals(user_id):
+    user = User.query.get_or_404(user_id)
+    check_user = do_user_check(user)
+    return render_template("user_saved_meals.html", user=user)
+
+@app.route('/users/<int:user_id>/shopping-list')
+def shopping_list(user_id):
+    user = User.query.get_or_404(user_id)
+    check_user = do_user_check(user)
+    return render_template("user_shopping_list.html", user=user)
