@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{%block title%}Home Page{%endblock%}
+{%block content%}
+<h1>{{data.strMeal}}</h1>
+<img src="{{data.strMealThumb}}" alt="{{data.strMeal}}">
+<h3 class="mt-3">Ingredients</h3>
+<ul>
+    {%for k, v in recipeIngredients.items()%}
+    <li>{{k}} {{v}}</li>
+    {%endfor%}
+</ul>
+<h3>Directions</h3>
+<p>{{data.strInstructions}}</p>
+{%endblock%}

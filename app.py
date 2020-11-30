@@ -7,8 +7,10 @@ from sqlalchemy.exc import IntegrityError
 import os
 import json
 import datetime
+import requests
 
 CURR_USER = 'user_id'
+API_BASE_URL = "https://www.themealdb.com/api/json/v1/1"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL','postgresql:///meal_planning_db')
@@ -155,11 +157,13 @@ def user_edit(user_id):
     
 ################## NAVBAR LINK/SEARCH ##################
 
-@app.route('/search', methods=["POST"])
-def search_engine():
+@app.route('/users/<int:user_id>/search', methods=["POST"])
+def search_engine(user_id):
+    user = User.query.get_or_404(user_id)
     search_input = request.form['search']
-    flash (f"Search results for {search_input}")
-    return redirect('/')
+    res = requests.get(f"{API_BASE_URL}/filter.php?c={search_input}")
+    data = res.json()
+    return render_template("search.html", data=data['meals'], search_input=search_input, user=user)
 
 @app.route('/users/<int:user_id>/calendar')
 def meal_calendar(user_id):
@@ -228,3 +232,24 @@ def delete_todo(list_id, user_id):
     else:
         flash("Access Denied!")
         return redirect('/')
+
+
+################## Meal Information ##################
+
+@app.route("/users/<int:user_id>/meals/<int:meal_id>/view/<meal_name>")
+def meal_info(user_id, meal_id, meal_name):
+    res = requests.get(f"{API_BASE_URL}/lookup.php?i={meal_id}")
+    data = res.json()
+    ingredients = []
+    measure = []
+    
+    for k, v in data['meals'][0].items():
+        if k.startswith("strIngredient"):
+            if v != '':
+                ingredients.append(v)
+        if k.startswith("strMeasure"):
+            if v != '':
+                measure.append(v)
+    
+    recipeIngredients = dict(zip(measure, ingredients))
+    return render_template("meal_info.html", user_id=user_id, data=data['meals'][0], recipeIngredients=recipeIngredients)
