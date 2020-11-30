@@ -161,7 +161,7 @@ def user_edit(user_id):
 def search_engine(user_id):
     user = User.query.get_or_404(user_id)
     search_input = request.form['search']
-    res = requests.get(f"{API_BASE_URL}/filter.php?c={search_input}")
+    res = requests.get(f"{API_BASE_URL}/search.php?s={search_input}")
     data = res.json()
     return render_template("search.html", data=data['meals'], search_input=search_input, user=user)
 
@@ -172,11 +172,13 @@ def meal_calendar(user_id):
     return render_template("user_meal_calendar.html", user=user)
 
 
-@app.route('/users/<int:user_id>/saved-meals')
+@app.route('/users/<int:user_id>/saved-meals', methods=['GET', 'POST'])
 def saved_meals(user_id):
     user = User.query.get_or_404(user_id)
     check_user = do_user_check(user)
-    return render_template("user_saved_meals.html", user=user)
+    saved_meals = Meal.query.filter_by(user_id=user.id)
+
+    return render_template("user_saved_meals.html", user=user, saved_meals=saved_meals)
 
 @app.route('/users/<int:user_id>/shopping-list', methods=['GET', 'POST'])
 def shopping_list(user_id):
@@ -240,6 +242,7 @@ def delete_todo(list_id, user_id):
 def meal_info(user_id, meal_id, meal_name):
     res = requests.get(f"{API_BASE_URL}/lookup.php?i={meal_id}")
     data = res.json()
+    saved_meal = Meal.query.filter_by(meal_id=meal_id).one_or_none()
     ingredients = []
     measure = []
     
@@ -252,4 +255,36 @@ def meal_info(user_id, meal_id, meal_name):
                 measure.append(v)
     
     recipeIngredients = dict(zip(measure, ingredients))
-    return render_template("meal_info.html", user_id=user_id, data=data['meals'][0], recipeIngredients=recipeIngredients)
+    return render_template("meal_info.html", user_id=user_id, data=data['meals'][0], recipeIngredients=recipeIngredients, saved_meal=saved_meal)
+
+
+
+
+################## Saved Meals ##################
+@app.route('/users/<int:user_id>/meals/<int:meal_id>/view/<meal_name>', methods=['POST'])
+def adding_saved_meal(user_id, meal_id, meal_name):
+    user = User.query.get_or_404(user_id)
+    check_user = do_user_check(user)
+    if check_user == None:
+        saved_meal = Meal(user_id=user.id, meal_id=meal_id, meal_name=meal_name)
+        db.session.add(saved_meal)
+        db.session.commit()
+        flash("Meal saved!", "success")
+        return redirect(f'/users/{user.id}/meals/{meal_id}/view/{meal_name}')
+    else:
+        flash("You don't have permission to do that!", "danger")
+        return redirect("/")
+
+@app.route('/users/<int:user_id>/saved-meals/<int:meal_id_saved>/delete', methods=['POST'])
+def deleting_saved_meal(user_id, meal_id_saved):
+    user = User.query.get_or_404(user_id)
+    check_user = do_user_check(user)
+    if check_user == None:
+        meal = Meal.query.filter(Meal.meal_id == meal_id_saved).first()
+        db.session.delete(meal)
+        db.session.commit()
+        flash(f"Successfully deleted", "success")
+        return redirect(f'/users/{user.id}/saved-meals')
+    else:
+        flash("You don't have permission to do that!", "danger")
+        return redirect("/")

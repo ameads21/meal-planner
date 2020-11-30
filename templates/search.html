@@ -7,7 +7,7 @@
 <h1>Search results for {{search_input}}</h1>
 <ul>
     {%for d in data%}
-    <li><a href="/users/{{user.id}}/meals/{{d.idMeal}}/view/{{d.strMeal}}">{{d}}</a></li>
+    <li><a href="/users/{{user.id}}/meals/{{d.idMeal}}/view/{{d.strMeal}}">{{d.strMeal}}</a></li>
     {%endfor%}
 </ul>
 {%endif%}

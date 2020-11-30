@@ -11,4 +11,11 @@
 </ul>
 <h3>Directions</h3>
 <p>{{data.strInstructions}}</p>
+{%if saved_meal%}
+<h4>Meal saved in list</h4>
+{%else%}
+<form method="POST">
+    <button>Save Meal</button>
+</form>
+{%endif%}
 {%endblock%}

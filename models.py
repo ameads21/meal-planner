@@ -22,6 +22,7 @@ class User(db.Model):
 
     todo_list = db.relationship("List", backref="users", cascade="all, delete-orphan")
     meal_calendar = db.relationship("Calendar", backref="users", cascade="all, delete-orphan")
+    saved_meals = db.relationship("Meal", backref="users", cascade="all, delete-orphan")
 
     @classmethod
     def register(cls, user):
@@ -47,6 +48,8 @@ class Meal(db.Model):
     __tablename__ = "meals"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     meal_id = db.Column(db.Integer, nullable=False)
+    meal_name = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 class List(db.Model):
 
