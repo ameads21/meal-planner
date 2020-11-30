@@ -7,7 +7,6 @@ bcrypt = Bcrypt()
 
 def connect_db(app):
     """Connect to database."""
-
     db.app = app
     db.init_app(app)
 
@@ -20,6 +19,9 @@ class User(db.Model):
     first_name = db.Column(db.Text, nullable=False)
     last_name = db.Column(db.Text, nullable=False)
     email = db.Column(db.Text, nullable=False)
+
+    todo_list = db.relationship("List", backref="users", cascade="all, delete-orphan")
+    meal_calendar = db.relationship("Calendar", backref="users", cascade="all, delete-orphan")
 
     @classmethod
     def register(cls, user):
@@ -60,5 +62,5 @@ class Calendar(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    meal_id = db.Column(db.Integer, db.ForeignKey('meals.id'))
-    date = db.Column(db.Date, nullable=False)
+    meal_id = db.Column(db.Integer)
+    selected_date = db.Column(db.String, nullable=False)

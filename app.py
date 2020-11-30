@@ -1,10 +1,12 @@
-from flask import Flask, redirect, render_template, session, flash, g, request
+from flask import Flask, redirect, render_template, session, flash, g, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Meal, Calendar, List
-from forms import UserLoginForm, UserRegisterForm, UserEditForm
+from forms import UserLoginForm, UserRegisterForm, UserEditForm, UserMealCalendarForm, UserListForm
 from secrets import key
 from sqlalchemy.exc import IntegrityError
 import os
+import json
+import datetime
 
 CURR_USER = 'user_id'
 
@@ -19,6 +21,9 @@ connect_db(app)
 db.create_all()
 
 toolbar = DebugToolbarExtension(app)
+
+def myconverter(obj):
+   return f"{obj.year}-{obj.month}-{obj.day}"
 
 @app.before_request
 def add_user_to_g():
@@ -146,7 +151,6 @@ def user_edit(user_id):
             return render_template('user_edit.html', form=form)
     else:
         return redirect("/")
-    
 
     
 ################## NAVBAR LINK/SEARCH ##################
@@ -170,8 +174,57 @@ def saved_meals(user_id):
     check_user = do_user_check(user)
     return render_template("user_saved_meals.html", user=user)
 
-@app.route('/users/<int:user_id>/shopping-list')
+@app.route('/users/<int:user_id>/shopping-list', methods=['GET', 'POST'])
 def shopping_list(user_id):
+    form = UserListForm()
     user = User.query.get_or_404(user_id)
     check_user = do_user_check(user)
-    return render_template("user_shopping_list.html", user=user)
+    if check_user == None:
+        if form.validate_on_submit():
+            new_todo = List(item=form.item.data, user_id=user.id)
+            db.session.add(new_todo)
+            db.session.commit()
+            flash(f"Successfully created {new_todo.item}!", "success")
+            return redirect(f'/users/{user.id}/shopping-list')
+        else:
+            todo_list = List.query.filter_by(user_id=user.id)
+            return render_template('user_shopping_list.html', form=form, user=user, todo_list=todo_list)
+    else:
+        return redirect("/")
+
+
+
+################## Meal Calendar ##################
+
+@app.route('/users/<int:user_id>/add-meal/<int:meal_id>', methods=['GET', 'POST'])
+def add_meal(user_id, meal_id):
+    user = User.query.get_or_404(user_id)
+    form = UserMealCalendarForm()
+    check_user = do_user_check(user)
+    if check_user == None:
+        if form.validate_on_submit():
+            dateSelected = myconverter(form.date.data)
+            dateInfo = Calendar(user_id=user_id, meal_id=meal_id, selected_date=dateSelected )
+            db.session.add(dateInfo)
+            db.session.commit()
+            return redirect(f'/users/{user.id}')
+        else:
+            return render_template('meal_add.html', form=form)
+    else:
+        return redirect(f"/users/{todo_item.user_id}/shopping-list")
+
+
+################## Todo List ##################
+@app.route('/users/<int:user_id>/shopping-list/<int:list_id>/delete', methods=['POST'])
+def delete_todo(list_id, user_id):
+    todo_item = List.query.get_or_404(list_id)
+    user = User.query.get_or_404(user_id)
+    check_user = do_user_check(user)
+    
+    if check_user == None:
+        db.session.delete(todo_item)
+        db.session.commit()
+        return redirect(f"/users/{user.id}/shopping-list")
+    else:
+        flash("Access Denied!")
+        return redirect('/')

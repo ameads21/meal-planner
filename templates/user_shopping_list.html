@@ -2,4 +2,25 @@
 {%block title%}Meal Calendar Page{%endblock%}
 {%block content%}
 <h1>This is the shopping list page for {{user.first_name}} {{user.last_name}}</h1>
+<form method="POST">
+    {{form.hidden_tag()}}
+
+    {%for field in form if field.widget.input_type != 'hidden' %}
+    <p>
+        {{field.label}}
+        {{field}}
+
+        {% for error in field.errors %}
+        <span class="form-text text-danger">{{error}}</span>
+        {%endfor%}
+    </p>
+    {%endfor%}
+    <button>Create</button>
+</form>
+<ul>
+    {%for todo in todo_list%}
+    <li>{{todo.item}} - <button class="delete-todo" data-id="{{todo.id}}" data-user="{{user.id}}">X</button></li>
+    {%endfor%}
+</ul>
+
 {%endblock%}
