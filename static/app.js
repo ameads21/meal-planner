@@ -7,7 +7,23 @@ async function deleteTodo(){
     $(this).parent().remove()
 }
 
-//Saved Meals
+//Adding Saved Meals
+async function saveMeal(evt){
+    evt.preventDefault()
+    $('#submitBtn').attr('disabled', true)
+    data = {
+        "user_id": $('#submitBtn').data('user_id'),
+        "meal_id": $('#submitBtn').data('meal_id'),
+        "meal_name": $('#submitBtn').data('meal_name'),
+        "meal_image": $('#submitBtn').data('meal_image')
+    }
+    await axios.post(`/users/${data.user_id}/meals/${data.meal_id}/view/${data.meal_name}`, data)
+    $('#save-meal-form').html('<h4>Meal added to saved meals</h4>');
+}
+$('#save-meal-form').on("submit", saveMeal);
+
+
+//Deleting Saved Meals
 $('.delete-saved-meals').click(deleteMeal)
 async function deleteMeal(){
     const meal_id = $(this).data('meal_id')
@@ -15,3 +31,11 @@ async function deleteMeal(){
     await axios.post(`/users/${user_id}/saved-meals/${meal_id}/delete`)
     $(this).parent().remove()
 }
+
+// //Adding ingredients to grocery list
+// $('.ingredient-add').click(addToList)
+// async function addToList(){
+//     const ingredient = $(this).data('ingredient')
+//     const user_id = $(this).data('user_id')
+//     await axios.post(`/users/${user_id}/shopping-list`)
+//}

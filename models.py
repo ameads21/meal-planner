@@ -47,9 +47,10 @@ class User(db.Model):
 class Meal(db.Model):
     __tablename__ = "meals"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     meal_id = db.Column(db.Integer, nullable=False)
     meal_name = db.Column(db.String, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    meal_image = db.Column(db.String, nullable=False)
 
 class List(db.Model):
 

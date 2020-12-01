@@ -157,12 +157,13 @@ def user_edit(user_id):
     
 ################## NAVBAR LINK/SEARCH ##################
 
-@app.route('/users/<int:user_id>/search', methods=["POST"])
+@app.route('/users/<int:user_id>/search', methods=['GET'])
 def search_engine(user_id):
     user = User.query.get_or_404(user_id)
     check_user = do_user_check(user)
+    search_input = request.args['search'] 
     if check_user == None:
-        search_input = request.form['search']
+        
         res = requests.get(f"{API_BASE_URL}/search.php?s={search_input}")
         data = res.json()
         return render_template("search.html", data=data['meals'], search_input=search_input, user=user)
@@ -244,6 +245,18 @@ def delete_todo(list_id, user_id):
     else:
         return redirect('/')
 
+# @app.route('/users/<int:user_id>/shopping-list/add/<ingredient>', methods=['POST'])
+# def add_ingredient(user_id, ingredient):
+#     user = User.query.get_or_404(user_id)
+#     check_user = do_user_check(user)
+
+#     if check_user == None:
+#         new_todo = List(item=ingredient, user_id=user.id)
+#         db.session.add(new_todo)
+#         db.session.commit()
+#         flash(f"Added {new_todo.item} to list!")
+#         return (f'users/{user.id}/meals/')
+
 
 ################## Meal Information ##################
 
@@ -254,13 +267,13 @@ def meal_info(user_id, meal_id, meal_name):
     if check_user == None:
         res = requests.get(f"{API_BASE_URL}/lookup.php?i={meal_id}")
         data = res.json()
-        saved_meal = Meal.query.filter_by(meal_id=meal_id).one_or_none()
+        saved_meal = Meal.query.filter(Meal.meal_id == meal_id, Meal.user_id == user_id).one_or_none()
         ingredients = []
         measure = []
         
         for k, v in data['meals'][0].items():
             if k.startswith("strIngredient"):
-                if v != '':
+                if v != '' and v!= None:
                     ingredients.append(v)
             if k.startswith("strMeasure"):
                 if v != '':
@@ -280,7 +293,9 @@ def adding_saved_meal(user_id, meal_id, meal_name):
     user = User.query.get_or_404(user_id)
     check_user = do_user_check(user)
     if check_user == None:
-        saved_meal = Meal(user_id=user.id, meal_id=meal_id, meal_name=meal_name)
+        # res = requests.get(f"{API_BASE_URL}/lookup.php?i={meal_id}")
+        # data = res.json()
+        saved_meal = Meal(user_id=user.id, meal_id=meal_id, meal_name=meal_name, meal_image=request.json['meal_image'])
         db.session.add(saved_meal)
         db.session.commit()
         flash("Meal saved!", "success")
@@ -288,12 +303,12 @@ def adding_saved_meal(user_id, meal_id, meal_name):
     else:
         return redirect("/")
 
-@app.route('/users/<int:user_id>/saved-meals/<int:meal_id_saved>/delete', methods=['POST'])
-def deleting_saved_meal(user_id, meal_id_saved):
+@app.route('/users/<int:user_id>/saved-meals/<int:meal_id>/delete', methods=['POST'])
+def deleting_saved_meal(user_id, meal_id):
     user = User.query.get_or_404(user_id)
     check_user = do_user_check(user)
     if check_user == None:
-        meal = Meal.query.filter(Meal.meal_id == meal_id_saved).first()
+        meal = Meal.query.filter(Meal.meal_id == meal_id, Meal.user_id == user_id).first()
         db.session.delete(meal)
         db.session.commit()
         flash(f"Successfully deleted", "success")

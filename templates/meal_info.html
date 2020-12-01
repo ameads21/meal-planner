@@ -6,13 +6,13 @@
 <h1>{{data.strMeal}}</h1>
 <img src="{{data.strMealThumb}}" alt="{{data.strMeal}}" class="img-thumbnail" style="width: 18rem">
 </div>
-<div class="col-sm-6">
+<div class="col-md-6 shadow bg-white rounded mt-5 mb-5">
 <h3 class="mt-3 mb-3">Ingredients</h3>
 <ul>
     <div class="row">
     {%for k, v in recipeIngredients.items()%}
     <div class="col-md-6">
-    <li class="mt-2">{{k}} {{v}}</li>
+    <li class="mt-2"><a href="" class="ingredient-add" data-user_id="{{user_id}}" data-ingredient="{{k}} {{v}}">{{k}} {{v}}</a></li>
     </div>
     {%endfor%}
 </div>
@@ -21,11 +21,16 @@
 </div>
 <h3>Directions</h3>
 <p>{{data.strInstructions}}</p>
+{{data}}
 {%if saved_meal%}
 <h4>Meal saved in list</h4>
 {%else%}
-<form method="POST">
-    <button>Save Meal</button>
+<form id="save-meal-form">
+    <button id="submitBtn" data-meal_id="{{data.idMeal}}" data-meal_name="{{data.strMeal}}" data-meal_image="{{data.strMealThumb}}" data-user_id="{{user_id}}">Save Meal</button>
 </form>
 {%endif%}
 {%endblock%}
+
+
+
+<!-- Fix the issue for the chicken enchilada casserole recipe with the meal saving -->
