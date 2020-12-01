@@ -58,6 +58,7 @@ class List(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     item = db.Column(db.Text, nullable=False)
+    checked = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 class Calendar(db.Model):

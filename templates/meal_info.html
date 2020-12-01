@@ -12,7 +12,7 @@
     <div class="row">
     {%for k, v in recipeIngredients.items()%}
     <div class="col-md-6">
-    <li class="mt-2"><a href="" class="ingredient-add" data-user_id="{{user_id}}" data-ingredient="{{k}} {{v}}">{{k}} {{v}}</a></li>
+    <li class="mt-2" style="cursor:pointer"><a  class="ingredient-add" data-user_id="{{user_id}}" data-ingredient="{{k}} {{v}}">{{k}} {{v}}</a></li>
     </div>
     {%endfor%}
 </div>
@@ -20,8 +20,12 @@
 </div>
 </div>
 <h3>Directions</h3>
-<p>{{data.strInstructions}}</p>
-{{data}}
+    <ol>
+        {%for d in directions%}
+        <li>{{d}}</li>
+        {%endfor%}
+    </ol>
+    
 {%if saved_meal%}
 <h4>Meal saved in list</h4>
 {%else%}
@@ -30,7 +34,3 @@
 </form>
 {%endif%}
 {%endblock%}
-
-
-
-<!-- Fix the issue for the chicken enchilada casserole recipe with the meal saving -->

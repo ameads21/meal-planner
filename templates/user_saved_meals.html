@@ -4,10 +4,24 @@
 <h1>This is the saved meal page for {{user.first_name}} {{user.last_name}}</h1>
 
 
-
-    <ul>
+<div class="row">
         {%for m in saved_meals%}
-        <li><a href="/users/{{user.id}}/meals/{{m.meal_id}}/view/{{m.meal_name}}">{{m.meal_name}}</a> - <button class="delete-saved-meals" data-meal_id="{{m.meal_id}}" data-user_id="{{user.id}}">X</button></li>
+        <!-- <li><a href="/users/{{user.id}}/meals/{{m.meal_id}}/view/{{m.meal_name}}">{{m.meal_name}}</a> - <button class="delete-saved-meals" data-meal_id="{{m.meal_id}}" data-user_id="{{user.id}}">X</button></li> -->
+        <div class="col-sm-6 col-lg-4">
+            <div class="card mt-5" style="width: 18rem">
+              <a href="/users/{{user.id}}/meals/{{m.meal_id}}/view/{{m.meal_name}}">
+                <img
+                  class="card-img-top"
+                  src="{{m.meal_image}}"
+                  alt="{{m.meal_name}}"
+                />
+                <div class="card-body">
+                  <p class="card-text">{{m.meal_name}}</p>
+                </div>
+              </a>
+            </div>
+          </div>
         {%endfor%}
-    </ul>
+    </div>
+    
 {%endblock%}

@@ -181,7 +181,7 @@ def meal_calendar(user_id):
         return redirect('/')
 
 
-@app.route('/users/<int:user_id>/saved-meals', methods=['GET', 'POST'])
+@app.route('/users/<int:user_id>/saved-meals', methods=['GET'])
 def saved_meals(user_id):
     user = User.query.get_or_404(user_id)
     check_user = do_user_check(user)
@@ -245,17 +245,32 @@ def delete_todo(list_id, user_id):
     else:
         return redirect('/')
 
-# @app.route('/users/<int:user_id>/shopping-list/add/<ingredient>', methods=['POST'])
-# def add_ingredient(user_id, ingredient):
-#     user = User.query.get_or_404(user_id)
-#     check_user = do_user_check(user)
+@app.route('/users/<int:user_id>/shopping-list/add', methods=['POST'])
+def add_todo(user_id):
+    user = User.query.get_or_404(user_id)
+    check_user = do_user_check(user)
+    if check_user == None:
+        new_todo = List(user_id=user.id, item=request.json['ingredient'])
+        db.session.add(new_todo)
+        db.session.commit()
+        flash("Added to grocery list")
+        return redirect('/')
+    else:
+        return redirect('/')
 
-#     if check_user == None:
-#         new_todo = List(item=ingredient, user_id=user.id)
-#         db.session.add(new_todo)
-#         db.session.commit()
-#         flash(f"Added {new_todo.item} to list!")
-#         return (f'users/{user.id}/meals/')
+@app.route('/users/<int:user_id>/shopping-list/<int:list_id>', methods=['POST'])
+def mark_todo(user_id, list_id):
+    user = User.query.get_or_404(user_id)
+    check_user = do_user_check(user)
+    if check_user == None:
+        todo = List.query.get_or_404(list_id)
+        todo.checked = not todo.checked
+        
+        db.session.add(todo)
+        db.session.commit()
+        return redirect(f'/users/{user.id}/shopping-list')
+    else:
+        return redirect('/')
 
 
 ################## Meal Information ##################
@@ -278,9 +293,11 @@ def meal_info(user_id, meal_id, meal_name):
             if k.startswith("strMeasure"):
                 if v != '':
                     measure.append(v)
+
+        directions = data['meals'][0]['strInstructions'].split('\r\n')
         
         recipeIngredients = dict(zip(measure, ingredients))
-        return render_template("meal_info.html", user_id=user_id, data=data['meals'][0], recipeIngredients=recipeIngredients, saved_meal=saved_meal)
+        return render_template("meal_info.html", user_id=user_id, data=data['meals'][0], recipeIngredients=recipeIngredients, saved_meal=saved_meal, directions=directions)
     else:
         return redirect('/')
 
@@ -293,8 +310,6 @@ def adding_saved_meal(user_id, meal_id, meal_name):
     user = User.query.get_or_404(user_id)
     check_user = do_user_check(user)
     if check_user == None:
-        # res = requests.get(f"{API_BASE_URL}/lookup.php?i={meal_id}")
-        # data = res.json()
         saved_meal = Meal(user_id=user.id, meal_id=meal_id, meal_name=meal_name, meal_image=request.json['meal_image'])
         db.session.add(saved_meal)
         db.session.commit()

@@ -1,4 +1,8 @@
-/* img {
-    max-width: 200px;
-    max-height: 200px;
-} */
+.checked {
+    text-decoration: line-through;
+}
+
+.todo-item{
+    width: 20px;
+    height: 20px;
+}

@@ -7,6 +7,26 @@ async function deleteTodo(){
     $(this).parent().remove()
 }
 
+$('.todo-item').click(markTodo)
+async function markTodo(){
+    const id = $(this).siblings('.delete-todo').data('id')
+    const user = $(this).siblings('.delete-todo').data('user')
+    await axios.post(`/users/${user}/shopping-list/${id}`)
+    $(this).siblings('.todo-text').toggleClass('checked')
+}
+
+$('.ingredient-add').click(addTodo)
+async function addTodo(){
+    const ingredient = $(this).data('ingredient')
+    const user_id = $(this).data('user_id')
+    data = {
+        "ingredient": ingredient,
+        "user_id": user_id
+    }
+    await axios.post(`/users/${user_id}/shopping-list/add`, data)
+    $(this).parent().append('<p>Added to grocery list!</p>')
+}
+
 //Adding Saved Meals
 async function saveMeal(evt){
     evt.preventDefault()
