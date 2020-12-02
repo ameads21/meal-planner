@@ -1,13 +1,14 @@
 from flask import Flask, redirect, render_template, session, flash, g, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Meal, Calendar, List
-from forms import UserLoginForm, UserRegisterForm, UserEditForm, UserMealCalendarForm, UserListForm
+from forms import UserLoginForm, UserRegisterForm, UserEditForm, UserMealCalendarForm, UserListForm, UserMealCalenderDateForm
 from secrets import key
 from sqlalchemy.exc import IntegrityError
 import os
 import json
 import datetime
 import requests
+import calendar
 
 CURR_USER = 'user_id'
 API_BASE_URL = "https://www.themealdb.com/api/json/v1/1"
@@ -213,15 +214,16 @@ def shopping_list(user_id):
 
 ################## Meal Calendar ##################
 
-@app.route('/users/<int:user_id>/add-meal/<int:meal_id>', methods=['GET', 'POST'])
-def add_meal(user_id, meal_id):
+@app.route('/users/<int:user_id>/add-meal', methods=['GET', 'POST'])
+def add_meal(user_id):
     user = User.query.get_or_404(user_id)
     form = UserMealCalendarForm()
     check_user = do_user_check(user)
     if check_user == None:
         if form.validate_on_submit():
+            meal_name = form.meal_name.data
             dateSelected = myconverter(form.date.data)
-            dateInfo = Calendar(user_id=user_id, meal_id=meal_id, selected_date=dateSelected )
+            dateInfo = Calendar(user_id=user_id, meal_name=meal_name, selected_date=dateSelected )
             db.session.add(dateInfo)
             db.session.commit()
             return redirect(f'/users/{user.id}')
@@ -229,6 +231,41 @@ def add_meal(user_id, meal_id):
             return render_template('meal_add.html', form=form)
     else:
         return redirect(f"/users/{todo_item.user_id}/shopping-list")
+
+
+@app.route('/users/<int:user_id>/calendar', methods=['POST'])
+def create_calendar(user_id):
+    c = calendar.HTMLCalendar(calendar.SUNDAY)
+    mealList = []
+    meals = Calendar.query.filter(Calendar.selected_date.like(f"{request.json['year']}-{request.json['month']}-%")).all()
+    for m in meals:
+        mealInfo = {
+            "meal_name": m.meal_name,
+            "date": m.selected_date
+        }
+        mealList.append(mealInfo)
+    data = {
+        "calendar": c.formatmonth(request.json['year'], request.json['month']),
+        "meals": mealList
+    }
+    return data
+
+@app.route('/users/<int:user_id>/calendar/add/<int:meal_id>/<meal_name>', methods=['GET', 'POST'])
+def add_recipe(user_id, meal_id, meal_name):
+    user = User.query.get_or_404(user_id)
+    form = UserMealCalenderDateForm()
+    check_user = do_user_check(user)
+    if check_user == None:
+        if form.validate_on_submit():
+            new_meal = Calendar(user_id=user_id, meal_id=meal_id, meal_name=meal_name, selected_date=form.date.data)
+            db.session.add(new_meal)
+            db.session.commit()
+            flash("Saved meal to calendar")
+            return redirect(f'/users/{user_id}/meals/{meal_id}/view/{meal_name}')
+        else:
+            return render_template('create_meal_calendar.html', form=form)
+    else:
+        return redirect('/')
 
 
 ################## Todo List ##################
@@ -330,3 +367,4 @@ def deleting_saved_meal(user_id, meal_id):
         return redirect(f'/users/{user.id}/saved-meals')
     else:
         return redirect("/")
+

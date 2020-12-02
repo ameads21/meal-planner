@@ -64,8 +64,11 @@ class List(db.Model):
 class Calendar(db.Model):
 
     __tablename__ = "calendar"
+    def __repr__(self):
+        return f"<Calendar {self.id} {self.user_id} {self.meal_id} {self.selected_date}>"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     meal_id = db.Column(db.Integer)
+    meal_name = db.Column(db.String, nullable=False)
     selected_date = db.Column(db.String, nullable=False)

@@ -21,7 +21,11 @@ class UserEditForm(FlaskForm):
     email = StringField('E-mail')
 
 class UserMealCalendarForm(FlaskForm):
-    date = DateField("Meal Date", format='%Y-%m-%d')
+    meal_name = StringField("Meal Name", validators=[InputRequired()])
+    date = DateField("Meal Date", format='%Y-%m-%d', validators=[InputRequired()])
+
+class UserMealCalenderDateForm(FlaskForm):
+    date = DateField("Meal Date", format='%Y-%m-%d', validators=[InputRequired()])
 
 class UserListForm(FlaskForm):
-    item = StringField("Todo Item", validators=[InputRequired()])
+    item = StringField("Item", validators=[InputRequired()])

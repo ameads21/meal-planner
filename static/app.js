@@ -49,13 +49,71 @@ async function deleteMeal(){
     const meal_id = $(this).data('meal_id')
     const user_id = $(this).data('user_id')
     await axios.post(`/users/${user_id}/saved-meals/${meal_id}/delete`)
-    $(this).parent().remove()
+    $(`#${meal_id}`).remove();
 }
 
-// //Adding ingredients to grocery list
-// $('.ingredient-add').click(addToList)
-// async function addToList(){
-//     const ingredient = $(this).data('ingredient')
-//     const user_id = $(this).data('user_id')
-//     await axios.post(`/users/${user_id}/shopping-list`)
-//}
+
+
+//Calendar
+user_id = document.querySelector('p').innerText
+table = false
+let today = new Date()
+let month = today.getMonth() + 1;
+let year = today.getFullYear();
+if (window.location.pathname == `/users/${user_id}/calendar`){
+    table = true
+    genearateCalendar()
+}
+async function genearateCalendar(){
+    $('.calendarDiv').html('<div class="d-flex justify-content-center spinner"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>')
+    data = {
+        "month": month,
+        "year": year
+    }
+    
+    calendar = await axios.post(`/users/${user_id}/calendar`, data)
+    $('.spinner').remove();
+    $('.container').append(`${calendar['data']['calendar']}`)
+    $('table').addClass('table table-striped')
+    $('.month').addClass('text-center')
+    header = document.querySelector('th')
+    header.innerHTML = `<button id="backward-month" onclick="previousMonth()"> < </button> ${header.innerText} <button id="forward-month" onclick="nextMonth()"> > </button>`
+    addLinks(month, year)
+    testDivs(calendar['data']['meals'])
+}
+
+function addLinks(month, year){
+    allTd = document.querySelectorAll('td')
+    for (d of allTd){
+        if (d.innerText != String.fromCharCode(160)){
+            d.id = `day-${d.innerText}`;
+            d.innerHTML = `<a href="/calendar/${year}/${month}/${d.innerText}">${d.innerText}</a>`
+        }
+    }
+}
+function testDivs(data){
+    for (d of data){
+        dateSplit = d.date.split('-')
+        $(`<div class="text-center">${d.meal_name}</div>`).appendTo($(`#day-${dateSplit[dateSplit.length - 1]}`))
+    }
+}
+
+function nextMonth(){
+    month += 1;
+    if (month >= 13){
+        month = 1;
+        year += 1;
+    }
+    $("table").remove();
+    genearateCalendar()
+}
+
+function previousMonth(){
+    month -= 1;
+    if (month <= 0){
+        month = 12;
+        year -= 1;
+    }
+    $("table").remove();
+    genearateCalendar()
+}
