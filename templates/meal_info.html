@@ -28,6 +28,9 @@
     
 {%if saved_meal%}
 <h4>Meal saved in list</h4>
+<form action="/users/{{user_id}}/calendar/add/{{data.idMeal}}/{{data.strMeal}}">
+    <button>Add to calendar</button>
+</form>
 {%else%}
 <form id="save-meal-form">
     <button id="submitBtn" data-meal_id="{{data.idMeal}}" data-meal_name="{{data.strMeal}}" data-meal_image="{{data.strMealThumb}}" data-user_id="{{user_id}}">Save Meal</button>

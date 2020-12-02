@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="/static/style.css">
   </head>
 <body>
-    <div class="container" style="margin-top: 2em">
+    <div id="container" class="container rounded" style="margin-top: 2em">
         {%for category, msg in get_flashed_messages(with_categories=True) %}
         <div class="alert alert-{{category}}">{{msg}}</div>
         {%endfor%}
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="#">Logo or profile picture here</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>

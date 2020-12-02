@@ -2,6 +2,8 @@
 {%block title%}Home Page{%endblock%}
 {%block content%}
 <h1>{{user.first_name}} {{user.last_name}}</h1>
+<p>Username</p>
+<p>{{user.username}}</p>
 <a href="/logout">Logout</a>
 <form action="/users/{{user.id}}/delete" method="POST">
 <button>Delete</button>

@@ -237,7 +237,7 @@ def add_meal(user_id):
 def create_calendar(user_id):
     c = calendar.HTMLCalendar(calendar.SUNDAY)
     mealList = []
-    meals = Calendar.query.filter(Calendar.selected_date.like(f"{request.json['year']}-{request.json['month']}-%")).all()
+    meals = Calendar.query.filter(Calendar.selected_date.like(f"{request.json['year']}-{request.json['month']}-%")).filter(Calendar.user_id == user_id).all()
     for m in meals:
         mealInfo = {
             "meal_name": m.meal_name,

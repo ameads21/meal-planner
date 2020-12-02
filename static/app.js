@@ -52,7 +52,11 @@ async function deleteMeal(){
     $(`#${meal_id}`).remove();
 }
 
-
+if (window.location.pathname == '/'){
+    $('#container').removeClass('container')
+    $('#container').removeAttr('style')
+    $('#container').css("height", "100%")
+}
 
 //Calendar
 user_id = document.querySelector('p').innerText
@@ -94,7 +98,8 @@ function addLinks(month, year){
 function testDivs(data){
     for (d of data){
         dateSplit = d.date.split('-')
-        $(`<div class="text-center">${d.meal_name}</div>`).appendTo($(`#day-${dateSplit[dateSplit.length - 1]}`))
+        day = dateSplit[dateSplit.length - 1]
+        $(`<div class="meal_info text-center">${d.meal_name}</div>`).appendTo($(`#day-${Number(day)}`))
     }
 }
 

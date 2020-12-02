@@ -1,20 +1,21 @@
 {% extends 'base.html' %}
 {%block title%}Home Page{%endblock%}
 {%block content%}
-<h1>Hello World!</h1>
+<h1 class='text-center mt-5'>Welcome</h1>
 <form method="POST">
     {{form.hidden_tag()}}
 
     {%for field in form if field.widget.input_type != 'hidden' %}
     <p>
         {{field.label}}
-        {{field}}
+        {{field(class_="form-control")}}
 
         {% for error in field.errors %}
         <span class="form-text text-danger">{{error}}</span>
         {%endfor%}
     </p>
     {%endfor%}
-    <button>Add</button>
+    <button class="btn btn-success form-control">Login</button>
 </form>
+<p>Don't have an account? Sign up <a href="/register">here!</a></p>
 {%endblock%}
