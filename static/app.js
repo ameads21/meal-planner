@@ -83,7 +83,7 @@ async function genearateCalendar(){
     header = document.querySelector('th')
     header.innerHTML = `<button id="backward-month" onclick="previousMonth()"> < </button> ${header.innerText} <button id="forward-month" onclick="nextMonth()"> > </button>`
     addLinks(month, year)
-    testDivs(calendar['data']['meals'])
+    addData(calendar['data']['meals'])
 }
 
 function addLinks(month, year){
@@ -91,20 +91,21 @@ function addLinks(month, year){
     for (d of allTd){
         if (d.innerText != String.fromCharCode(160)){
             d.innerHTML = `<div>${d.innerText}<ul class="list-group list-group-flush" id="day-${d.innerText}"></ul></div>`
-            // `<a href="/calendar/${year}/${month}/${d.innerText}">${d.innerText}<ul class="list-group" id="day-${d.innerText}"></ul></a>`
         }
     }
 }
-function testDivs(data){
+function addData(data){
+    numMeals = 0
     for (d of data){
         dateSplit = d.date.split('-')
         day = dateSplit[dateSplit.length - 1]
         if (d.meal_id != null)
         {
-            $(`<li class="meal_info list-group-item text-center"><a href="/users/${d.user_id}/meals/${d.meal_id}/view/${d.meal_name}">${d.meal_name}</a> <br /> <button class="close" onclick="delete_calendar_meal(${d.user_id},${d.id}, '${d.date}')" aria-label="Close"><span aria-hidden="true">&times;</span></button></li>`).appendTo($(`#day-${Number(day)}`))
+            $(`<li class="meal_info list-group-item text-center"><button class="close meal_info list-group-item " id="meal_${numMeals}" onclick="delete_calendar_meal(${d.user_id},${d.id}, '${d.date}', ${numMeals})" aria-label="Close"><span aria-hidden="true">&times;</span></button><a href="/users/${d.user_id}/meals/${d.meal_id}/view/${d.meal_name}">${d.meal_name}</a></li>`).appendTo($(`#day-${Number(day)}`))
         } else {
-            $(`<li class="meal_info list-group-item text-center">${d.meal_name}<br /> <button class="close" onclick="delete_calendar_meal(${d.user_id},${d.id}, '${d.date}')" aria-label="Close"><span aria-hidden="true">&times;</span></button></li>`).appendTo($(`#day-${Number(day)}`))
+            $(`<li class="meal_info list-group-item text-center"><button class="close" id="meal_${numMeals}" onclick="delete_calendar_meal(${d.user_id},${d.id},'${d.date}', ${numMeals})" aria-label="Close"><span aria-hidden="true">&times;</span></button>${d.meal_name}</li>`).appendTo($(`#day-${Number(day)}`))
         }
+        numMeals += 1;
     }
 }
 
@@ -128,9 +129,9 @@ function previousMonth(){
     genearateCalendar()
 }
 
-async function delete_calendar_meal(user_id, id, date){
+async function delete_calendar_meal(user_id, id, date, meal_num){
     await axios.post(`/users/${user_id}/calendar/delete/${id}`)
     dateSplit = date.split('-')
     day = dateSplit[dateSplit.length - 1]
-    $(`#day-${Number(day)}`).remove();
+    $(`#meal_${meal_num}`).closest("li").remove()
 }

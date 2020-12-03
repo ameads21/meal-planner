@@ -52,13 +52,13 @@ def do_user_check(check_user):
     """Check session for logged in user"""
     if not g.user:
         flash("Please login first!", "danger")
-        return "Denied"
+        return False
 
-    if check_user.id != session['user_id']:
+    if check_user != session['user_id']:
         flash("Access Denied!", "danger")
-        return "Denied"
+        return False
 
-    return None
+    return True
 
 @app.route('/')
 def home_page():
@@ -115,9 +115,9 @@ def logout_user():
 ################## USER PAGE, DELETE, EDIT ##################
 @app.route('/users/<int:user_id>')
 def user_page(user_id):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
         return render_template("user.html", user=user)
     else:
         return redirect("/")
@@ -125,9 +125,9 @@ def user_page(user_id):
 
 @app.route('/users/<int:user_id>/delete', methods=["POST"])
 def user_delete(user_id):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
         do_logout()
         db.session.delete(g.user)
         db.session.commit()
@@ -138,10 +138,10 @@ def user_delete(user_id):
 
 @app.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
 def user_edit(user_id):
-    user = User.query.get_or_404(user_id)
-    form = UserEditForm(obj=user)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
+        form = UserEditForm(obj=user)
         if form.validate_on_submit():
             user.first_name = form.first_name.data
             user.last_name = form.last_name.data
@@ -160,11 +160,10 @@ def user_edit(user_id):
 
 @app.route('/users/<int:user_id>/search', methods=['GET'])
 def search_engine(user_id):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    search_input = request.args['search'] 
-    if check_user == None:
-        
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
+        search_input = request.args['search'] 
         res = requests.get(f"{API_BASE_URL}/search.php?s={search_input}")
         data = res.json()
         return render_template("search.html", data=data['meals'], search_input=search_input, user=user)
@@ -173,9 +172,9 @@ def search_engine(user_id):
 
 @app.route('/users/<int:user_id>/calendar')
 def meal_calendar(user_id):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
         return render_template("user_meal_calendar.html", user=user)
     else:
         flash("Access Denied!", "danger")
@@ -184,20 +183,20 @@ def meal_calendar(user_id):
 
 @app.route('/users/<int:user_id>/saved-meals', methods=['GET'])
 def saved_meals(user_id):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    saved_meals = Meal.query.filter_by(user_id=user.id)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
+        saved_meals = Meal.query.filter_by(user_id=user.id)
         return render_template("user_saved_meals.html", user=user, saved_meals=saved_meals)
     else:
         return redirect('/')
 
 @app.route('/users/<int:user_id>/shopping-list', methods=['GET', 'POST'])
 def shopping_list(user_id):
-    form = UserListForm()
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        form = UserListForm()
+        user = User.query.get_or_404(user_id)
         if form.validate_on_submit():
             new_todo = List(item=form.item.data, user_id=user.id)
             db.session.add(new_todo)
@@ -216,49 +215,53 @@ def shopping_list(user_id):
 
 @app.route('/users/<int:user_id>/add-meal', methods=['GET', 'POST'])
 def add_meal(user_id):
-    user = User.query.get_or_404(user_id)
-    form = UserMealCalendarForm()
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        form = UserMealCalendarForm()
+        user = User.query.get_or_404(user_id)
         if form.validate_on_submit():
             meal_name = form.meal_name.data
             dateSelected = myconverter(form.date.data)
             dateInfo = Calendar(user_id=user_id, meal_name=meal_name, selected_date=dateSelected )
             db.session.add(dateInfo)
             db.session.commit()
-            return redirect(f'/users/{user.id}')
+            return redirect(f'/users/{user.id}/calendar')
         else:
             return render_template('meal_add.html', form=form)
     else:
-        return redirect(f"/users/{todo_item.user_id}/shopping-list")
+        return redirect('/')
 
 
 @app.route('/users/<int:user_id>/calendar', methods=['POST'])
 def create_calendar(user_id):
-    c = calendar.HTMLCalendar(calendar.SUNDAY)
-    mealList = []
-    meals = Calendar.query.filter(Calendar.selected_date.like(f"{request.json['year']}-{request.json['month']}-%")).filter(Calendar.user_id == user_id).all()
-    for m in meals:
-        mealInfo = {
-            "id": m.id,
-            "user_id": user_id,
-            "meal_id": m.meal_id,
-            "meal_name": m.meal_name,
-            "date": m.selected_date
+    check_user = do_user_check(user_id)
+    if check_user:
+        c = calendar.HTMLCalendar(calendar.SUNDAY)
+        mealList = []
+        meals = Calendar.query.filter(Calendar.selected_date.like(f"{request.json['year']}-{request.json['month']}-%")).filter(Calendar.user_id == user_id).all()
+        for m in meals:
+            mealInfo = {
+                "id": m.id,
+                "user_id": user_id,
+                "meal_id": m.meal_id,
+                "meal_name": m.meal_name,
+                "date": m.selected_date
+            }
+            mealList.append(mealInfo)
+        data = {
+            "calendar": c.formatmonth(request.json['year'], request.json['month']),
+            "meals": mealList
         }
-        mealList.append(mealInfo)
-    data = {
-        "calendar": c.formatmonth(request.json['year'], request.json['month']),
-        "meals": mealList
-    }
-    return data
+        return data
+    else:
+        return redirect('/')
 
 @app.route('/users/<int:user_id>/calendar/add/<int:meal_id>/<meal_name>', methods=['GET', 'POST'])
 def add_recipe(user_id, meal_id, meal_name):
-    user = User.query.get_or_404(user_id)
-    form = UserMealCalenderDateForm()
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
+        form = UserMealCalenderDateForm()
         if form.validate_on_submit():
             new_meal = Calendar(user_id=user_id, meal_id=meal_id, meal_name=meal_name, selected_date=form.date.data)
             db.session.add(new_meal)
@@ -272,9 +275,9 @@ def add_recipe(user_id, meal_id, meal_name):
 
 @app.route('/users/<int:user_id>/calendar/delete/<int:meal_id>', methods=['POST'])
 def delete_calendar_meal(user_id, meal_id):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
         meal = Calendar.query.get_or_404(meal_id)
         db.session.delete(meal)
         db.session.commit()
@@ -286,11 +289,10 @@ def delete_calendar_meal(user_id, meal_id):
 ################## Todo List ##################
 @app.route('/users/<int:user_id>/shopping-list/<int:list_id>/delete', methods=['POST'])
 def delete_todo(list_id, user_id):
-    todo_item = List.query.get_or_404(list_id)
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        todo_item = List.query.get_or_404(list_id)
+        user = User.query.get_or_404(user_id)
         db.session.delete(todo_item)
         db.session.commit()
         return redirect(f"/users/{user.id}/shopping-list")
@@ -299,9 +301,9 @@ def delete_todo(list_id, user_id):
 
 @app.route('/users/<int:user_id>/shopping-list/add', methods=['POST'])
 def add_todo(user_id):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
         new_todo = List(user_id=user.id, item=request.json['ingredient'])
         db.session.add(new_todo)
         db.session.commit()
@@ -312,9 +314,9 @@ def add_todo(user_id):
 
 @app.route('/users/<int:user_id>/shopping-list/<int:list_id>', methods=['POST'])
 def mark_todo(user_id, list_id):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
         todo = List.query.get_or_404(list_id)
         todo.checked = not todo.checked
         
@@ -329,9 +331,9 @@ def mark_todo(user_id, list_id):
 
 @app.route("/users/<int:user_id>/meals/<int:meal_id>/view/<meal_name>")
 def meal_info(user_id, meal_id, meal_name):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
         res = requests.get(f"{API_BASE_URL}/lookup.php?i={meal_id}")
         data = res.json()
         saved_meal = Meal.query.filter(Meal.meal_id == meal_id, Meal.user_id == user_id).one_or_none()
@@ -361,9 +363,9 @@ def meal_info(user_id, meal_id, meal_name):
 ################## Saved Meals ##################
 @app.route('/users/<int:user_id>/meals/<int:meal_id>/view/<meal_name>', methods=['POST'])
 def adding_saved_meal(user_id, meal_id, meal_name):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
         saved_meal = Meal(user_id=user.id, meal_id=meal_id, meal_name=meal_name, meal_image=request.json['meal_image'])
         db.session.add(saved_meal)
         db.session.commit()
@@ -374,9 +376,9 @@ def adding_saved_meal(user_id, meal_id, meal_name):
 
 @app.route('/users/<int:user_id>/saved-meals/<int:meal_id>/delete', methods=['POST'])
 def deleting_saved_meal(user_id, meal_id):
-    user = User.query.get_or_404(user_id)
-    check_user = do_user_check(user)
-    if check_user == None:
+    check_user_id = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
         meal = Meal.query.filter(Meal.meal_id == meal_id, Meal.user_id == user_id).first()
         db.session.delete(meal)
         db.session.commit()
