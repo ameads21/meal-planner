@@ -90,8 +90,8 @@ function addLinks(month, year){
     allTd = document.querySelectorAll('td')
     for (d of allTd){
         if (d.innerText != String.fromCharCode(160)){
-            d.id = `day-${d.innerText}`;
-            d.innerHTML = `<a href="/calendar/${year}/${month}/${d.innerText}">${d.innerText}</a>`
+            d.innerHTML = `<div>${d.innerText}<ul class="list-group list-group-flush" id="day-${d.innerText}"></ul></div>`
+            // `<a href="/calendar/${year}/${month}/${d.innerText}">${d.innerText}<ul class="list-group" id="day-${d.innerText}"></ul></a>`
         }
     }
 }
@@ -99,7 +99,12 @@ function testDivs(data){
     for (d of data){
         dateSplit = d.date.split('-')
         day = dateSplit[dateSplit.length - 1]
-        $(`<div class="meal_info text-center">${d.meal_name}</div>`).appendTo($(`#day-${Number(day)}`))
+        if (d.meal_id != null)
+        {
+            $(`<li class="meal_info list-group-item text-center"><a href="/users/${d.user_id}/meals/${d.meal_id}/view/${d.meal_name}">${d.meal_name}</a> <br /> <button class="close" onclick="delete_calendar_meal(${d.user_id},${d.id}, '${d.date}')" aria-label="Close"><span aria-hidden="true">&times;</span></button></li>`).appendTo($(`#day-${Number(day)}`))
+        } else {
+            $(`<li class="meal_info list-group-item text-center">${d.meal_name}<br /> <button class="close" onclick="delete_calendar_meal(${d.user_id},${d.id}, '${d.date}')" aria-label="Close"><span aria-hidden="true">&times;</span></button></li>`).appendTo($(`#day-${Number(day)}`))
+        }
     }
 }
 
@@ -121,4 +126,11 @@ function previousMonth(){
     }
     $("table").remove();
     genearateCalendar()
+}
+
+async function delete_calendar_meal(user_id, id, date){
+    await axios.post(`/users/${user_id}/calendar/delete/${id}`)
+    dateSplit = date.split('-')
+    day = dateSplit[dateSplit.length - 1]
+    $(`#day-${Number(day)}`).remove();
 }

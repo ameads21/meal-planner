@@ -16,12 +16,19 @@ body, html{
     min-height: 100%;
 }
 
-/* #container{
-    height: 100%;
-} */
+table td{
+    table-layout: fixed;
+    width: 14%;
+    height: 130px;
+}
+
 
 .meal_info{
     overflow-wrap: normal break-word;
+    
+}
+ul{
+    padding: 0;
 }
 .hero-image {
     /* The image used */
@@ -41,3 +48,5 @@ body, html{
       transform: translate(-50%, -50%);
       color: white;
   }
+
+  

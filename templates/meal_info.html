@@ -10,9 +10,13 @@
 <h3 class="mt-3 mb-3">Ingredients</h3>
 <ul>
     <div class="row">
-    {%for k, v in recipeIngredients.items()%}
+    {%for k, v in recipeIngredients%}
     <div class="col-md-6">
-    <li class="mt-2" style="cursor:pointer"><a  class="ingredient-add" data-user_id="{{user_id}}" data-ingredient="{{k}} {{v}}">{{k}} {{v}}</a></li>
+        {%if k != None%}
+        <li class="mt-2" style="cursor:pointer"><a  class="ingredient-add" data-user_id="{{user_id}}" data-ingredient="{{k}} {{v}}">{{k}} {{v}}</a></li>
+        {%else%}
+        <li class="mt-2" style="cursor:pointer"><a  class="ingredient-add" data-user_id="{{user_id}}" data-ingredient="{{v}}">{{v}}</a></li>
+        {%endif%}
     </div>
     {%endfor%}
 </div>

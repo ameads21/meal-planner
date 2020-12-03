@@ -240,6 +240,9 @@ def create_calendar(user_id):
     meals = Calendar.query.filter(Calendar.selected_date.like(f"{request.json['year']}-{request.json['month']}-%")).filter(Calendar.user_id == user_id).all()
     for m in meals:
         mealInfo = {
+            "id": m.id,
+            "user_id": user_id,
+            "meal_id": m.meal_id,
             "meal_name": m.meal_name,
             "date": m.selected_date
         }
@@ -264,6 +267,18 @@ def add_recipe(user_id, meal_id, meal_name):
             return redirect(f'/users/{user_id}/meals/{meal_id}/view/{meal_name}')
         else:
             return render_template('create_meal_calendar.html', form=form)
+    else:
+        return redirect('/')
+
+@app.route('/users/<int:user_id>/calendar/delete/<int:meal_id>', methods=['POST'])
+def delete_calendar_meal(user_id, meal_id):
+    user = User.query.get_or_404(user_id)
+    check_user = do_user_check(user)
+    if check_user == None:
+        meal = Calendar.query.get_or_404(meal_id)
+        db.session.delete(meal)
+        db.session.commit()
+        return redirect(f'/users/{user_id}/calendar')
     else:
         return redirect('/')
 
@@ -328,13 +343,15 @@ def meal_info(user_id, meal_id, meal_name):
                 if v != '' and v!= None:
                     ingredients.append(v)
             if k.startswith("strMeasure"):
-                if v != '':
+                if v == '':
+                    measure.append(None)
+                else:
                     measure.append(v)
 
         directions = data['meals'][0]['strInstructions'].split('\r\n')
         
-        recipeIngredients = dict(zip(measure, ingredients))
-        return render_template("meal_info.html", user_id=user_id, data=data['meals'][0], recipeIngredients=recipeIngredients, saved_meal=saved_meal, directions=directions)
+        recipeIngredients = list(zip(measure, ingredients))
+        return render_template("meal_info.html", user_id=user_id, data=data['meals'][0], recipeIngredients=recipeIngredients, saved_meal=saved_meal, directions=directions, ingredients=ingredients, measure=measure)
     else:
         return redirect('/')
 
