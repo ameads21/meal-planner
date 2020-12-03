@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{%block title%}Home Page{%endblock%}
+{%block title%}Register{%endblock%}
 {%block content%}
 <h1 class='text-center mt-5'>Welcome</h1>
 <form method="POST" >
@@ -15,7 +15,8 @@
         {%endfor%}
     </p>
     {%endfor%}
-    <button class="btn btn-success form-control form-control-lg">Create</button>
+    <a href="/" class="btn btn-primary">Back</a>
+    <button class="btn btn-success">Create</button>
 </form>
 <p>Already have an account? Log in <a href="/login">here!</a></p>
 {%endblock%}

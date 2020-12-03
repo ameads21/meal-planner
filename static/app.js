@@ -52,8 +52,11 @@ async function deleteMeal(){
     $(`#${meal_id}`).remove();
 }
 //Calendar
-user_id = document.querySelector('p').innerText
-table = false
+let user_id = null
+if (document.querySelector('p') != null){
+    user_id = document.querySelector('p').innerText
+}
+let table = false
 let today = new Date()
 let month = today.getMonth() + 1;
 let year = today.getFullYear();
@@ -127,11 +130,4 @@ async function delete_calendar_meal(user_id, id, date, meal_num){
     dateSplit = date.split('-')
     day = dateSplit[dateSplit.length - 1]
     $(`#meal_${meal_num}`).closest("li").remove()
-}
-
-
-//Adding Style
-if (window.location.pathname == '/'){
-    $('#container').removeClass('container')
-    $('#container').css("height", "100%")
 }

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{%block title%}Home Page{%endblock%}
+{%block title%}{{user.first_name}} {{user.last_name}}{%endblock%}
 {%block content%}
 <h1>Hello World!</h1>
 <form method="POST">
@@ -8,13 +8,14 @@
     {%for field in form if field.widget.input_type != 'hidden' %}
     <p>
         {{field.label}}
-        {{field}}
+        {{field(class_="form-control")}}
 
         {% for error in field.errors %}
         <span class="form-text text-danger">{{error}}</span>
         {%endfor%}
     </p>
     {%endfor%}
-    <button>Update</button>
+    <a href="/users/{{user.id}}" class="btn btn-primary">Back</a>
+    <button class="btn btn-success">Update</button>
 </form>
 {%endblock%}

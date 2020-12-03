@@ -1,14 +1,13 @@
 {% extends 'base.html' %}
-{%block title%}Meal Calendar Page{%endblock%}
+{%block title%}Shopping List{%endblock%}
 {%block content%}
-<h1>This is the shopping list page for {{user.first_name}} {{user.last_name}}</h1>
+<h1 class="text-center">Shopping List</h1>
 <form method="POST">
     {{form.hidden_tag()}}
 
     {%for field in form if field.widget.input_type != 'hidden' %}
     <div class="form-group">
-        <div class="row">
-        <p class="col-6">
+        <p>
             {{field.label}}
             {{field(class_="form-control")}}
     
@@ -16,7 +15,6 @@
             <span class="form-text text-danger">{{error}}</span>
             {%endfor%}
         </p>
-    </div>
     </div>
     {%endfor%}
     <button class="btn btn-primary">Create</button>

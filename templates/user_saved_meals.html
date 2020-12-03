@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
-{%block title%}Meal Calendar Page{%endblock%}
+{%block title%}Favorite Meals{%endblock%}
 {%block content%}
-<h1>This is the saved meal page for {{user.first_name}} {{user.last_name}}</h1>
+<h1 class="text-center">Favorite Meals</h1>
 
-
+{%if saved_meals.count() == 0%}
+<div class="text-center">
+  <h3>It seems you don't have any favorite meals.</h3>
+  <p class=>To add some, just search a recipe and click add to favorites</p>
+</div>
+        
+{%else%}
 <div class="row">
         {%for m in saved_meals%}
-        <!-- <li><a href="/users/{{user.id}}/meals/{{m.meal_id}}/view/{{m.meal_name}}">{{m.meal_name}}</a> - <button class="delete-saved-meals" data-meal_id="{{m.meal_id}}" data-user_id="{{user.id}}">X</button></li> -->
         <div class="col-sm-6 col-lg-4" id="{{m.meal_id}}">
             <div class="card mt-5" style="width: 18rem">
               <a href="/users/{{user.id}}/meals/{{m.meal_id}}/view/{{m.meal_name}}">
@@ -25,6 +30,7 @@
             </div>
           </div>
         {%endfor%}
+        {%endif%}
     </div>
     
 {%endblock%}

@@ -65,7 +65,7 @@ def home_page():
     if not g.user:
         return render_template('index.html')
     
-    return redirect(f'/users/{g.user.id}')
+    return redirect(f'/users/{g.user.id}/calendar')
 
 ################## USER LOGIN, REGISTER, LOGOUT ##################
 @app.route('/register', methods=["GET", "POST"])
@@ -84,7 +84,7 @@ def register_user():
             
         session['user_id'] = register_user.id
         flash("Welcome! Successfully Created Your Account!", "success")
-        return redirect(f'/users/{register_user.id}')
+        return redirect(f'/users/{register_user.id}/calendar')
     else:
 
         return render_template('register.html', form=form)
@@ -151,7 +151,7 @@ def user_edit(user_id):
             flash("Updated!", "success")
             return redirect(f'/users/{user.id}')
         else:
-            return render_template('user_edit.html', form=form)
+            return render_template('user_edit.html', form=form, user=user)
     else:
         return redirect("/")
 
@@ -198,7 +198,7 @@ def add_own_meal(user_id):
             db.session.commit()
             return redirect(f'/users/{user.id}/calendar')
         else:
-            return render_template('meal_add.html', form=form)
+            return render_template('meal_add.html', form=form, user=user)
     else:
         return redirect('/')
 
@@ -240,7 +240,7 @@ def add_recipe(user_id, meal_id, meal_name):
             flash("Saved meal to calendar", "success")
             return redirect(f'/users/{user_id}/meals/{meal_id}/view/{meal_name}')
         else:
-            return render_template('create_meal_calendar.html', form=form)
+            return render_template('create_meal_calendar.html', form=form, user=user, meal_id=meal_id, meal_name=meal_name)
     else:
         return redirect('/')
 
