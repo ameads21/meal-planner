@@ -99,7 +99,7 @@ def login_user():
         if user:
             do_login(user)
             flash(f"Welcome back {user.username}!", "success")
-            return redirect(f'/users/{user.id}')
+            return redirect(f'/users/{user.id}/calendar')
         else:
             form.username.errors = ['Invalid username/password']
 
@@ -156,7 +156,7 @@ def user_edit(user_id):
         return redirect("/")
 
     
-################## NAVBAR LINK/SEARCH ##################
+################## NAVBAR SEARCH ##################
 
 @app.route('/users/<int:user_id>/search', methods=['GET'])
 def search_engine(user_id):
@@ -170,6 +170,9 @@ def search_engine(user_id):
     else:
         return redirect('/')
 
+
+################## Meal Calendar ##################
+
 @app.route('/users/<int:user_id>/calendar')
 def meal_calendar(user_id):
     check_user = do_user_check(user_id)
@@ -181,40 +184,8 @@ def meal_calendar(user_id):
         return redirect('/')
 
 
-@app.route('/users/<int:user_id>/saved-meals', methods=['GET'])
-def saved_meals(user_id):
-    check_user = do_user_check(user_id)
-    if check_user:
-        user = User.query.get_or_404(user_id)
-        saved_meals = Meal.query.filter_by(user_id=user.id)
-        return render_template("user_saved_meals.html", user=user, saved_meals=saved_meals)
-    else:
-        return redirect('/')
-
-@app.route('/users/<int:user_id>/shopping-list', methods=['GET', 'POST'])
-def shopping_list(user_id):
-    check_user = do_user_check(user_id)
-    if check_user:
-        form = UserListForm()
-        user = User.query.get_or_404(user_id)
-        if form.validate_on_submit():
-            new_todo = List(item=form.item.data, user_id=user.id)
-            db.session.add(new_todo)
-            db.session.commit()
-            flash(f"Successfully created {new_todo.item}!", "success")
-            return redirect(f'/users/{user.id}/shopping-list')
-        else:
-            todo_list = List.query.filter_by(user_id=user.id)
-            return render_template('user_shopping_list.html', form=form, user=user, todo_list=todo_list)
-    else:
-        return redirect("/")
-
-
-
-################## Meal Calendar ##################
-
 @app.route('/users/<int:user_id>/add-meal', methods=['GET', 'POST'])
-def add_meal(user_id):
+def add_own_meal(user_id):
     check_user = do_user_check(user_id)
     if check_user:
         form = UserMealCalendarForm()
@@ -286,7 +257,26 @@ def delete_calendar_meal(user_id, meal_id):
         return redirect('/')
 
 
-################## Todo List ##################
+################## Todo/Shopping List ##################
+
+@app.route('/users/<int:user_id>/shopping-list', methods=['GET', 'POST'])
+def shopping_list(user_id):
+    check_user = do_user_check(user_id)
+    if check_user:
+        form = UserListForm()
+        user = User.query.get_or_404(user_id)
+        if form.validate_on_submit():
+            new_todo = List(item=form.item.data, user_id=user.id)
+            db.session.add(new_todo)
+            db.session.commit()
+            flash(f"Successfully created {new_todo.item}!", "success")
+            return redirect(f'/users/{user.id}/shopping-list')
+        else:
+            todo_list = List.query.filter_by(user_id=user.id).order_by(List.checked)
+            return render_template('user_shopping_list.html', form=form, user=user, todo_list=todo_list)
+    else:
+        return redirect("/")
+
 @app.route('/users/<int:user_id>/shopping-list/<int:list_id>/delete', methods=['POST'])
 def delete_todo(list_id, user_id):
     check_user = do_user_check(user_id)
@@ -361,6 +351,18 @@ def meal_info(user_id, meal_id, meal_name):
 
 
 ################## Saved Meals ##################
+
+
+@app.route('/users/<int:user_id>/saved-meals', methods=['GET'])
+def saved_meals(user_id):
+    check_user = do_user_check(user_id)
+    if check_user:
+        user = User.query.get_or_404(user_id)
+        saved_meals = Meal.query.filter_by(user_id=user.id)
+        return render_template("user_saved_meals.html", user=user, saved_meals=saved_meals)
+    else:
+        return redirect('/')
+
 @app.route('/users/<int:user_id>/meals/<int:meal_id>/view/<meal_name>', methods=['POST'])
 def adding_saved_meal(user_id, meal_id, meal_name):
     check_user = do_user_check(user_id)
