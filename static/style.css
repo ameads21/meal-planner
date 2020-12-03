@@ -22,18 +22,13 @@ table td{
     height: 130px;
 }
 
-
 .meal_info{
     overflow-wrap: normal break-word;
-    
-}
-ul{
-    padding: 0;
 }
 .hero-image {
     /* The image used */
     background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://images.unsplash.com/photo-1512034400317-de97d7d6c3ed?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=967&q=80");
-    height: 100%;
+    min-height: 100%;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -49,4 +44,15 @@ ul{
       color: white;
   }
 
-  
+  .card{
+      transition: all .5s;
+      margin-bottom: 20px;
+      bottom: 0;
+  }
+
+  .card:hover{
+      opacity: 0.8;
+      margin-bottom: 0;
+      bottom: 20px;
+      transition: all .5s;
+  }

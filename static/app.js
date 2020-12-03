@@ -38,7 +38,7 @@ async function saveMeal(evt){
         "meal_image": $('#submitBtn').data('meal_image')
     }
     await axios.post(`/users/${data.user_id}/meals/${data.meal_id}/view/${data.meal_name}`, data)
-    $('#save-meal-form').html('<h4>Meal added to saved meals</h4>');
+    $('#save-meal-form').html('<h4>Meal added to favorites</h4>');
 }
 $('#save-meal-form').on("submit", saveMeal);
 
@@ -51,13 +51,6 @@ async function deleteMeal(){
     await axios.post(`/users/${user_id}/saved-meals/${meal_id}/delete`)
     $(`#${meal_id}`).remove();
 }
-
-if (window.location.pathname == '/'){
-    $('#container').removeClass('container')
-    $('#container').removeAttr('style')
-    $('#container').css("height", "100%")
-}
-
 //Calendar
 user_id = document.querySelector('p').innerText
 table = false
@@ -81,12 +74,12 @@ async function genearateCalendar(){
     $('table').addClass('table table-striped')
     $('.month').addClass('text-center')
     header = document.querySelector('th')
-    header.innerHTML = `<button id="backward-month" onclick="previousMonth()"> < </button> ${header.innerText} <button id="forward-month" onclick="nextMonth()"> > </button>`
-    addLinks(month, year)
+    header.innerHTML = `<button class="btn btn-primary float-left" id="backward-month" onclick="previousMonth()"> < </button> <span style="font-size:25px">${header.innerText}</span> <button class="btn btn-primary float-right" id="forward-month" onclick="nextMonth()"> > </button>`
+    addLinks()
     addData(calendar['data']['meals'])
 }
 
-function addLinks(month, year){
+function addLinks(){
     allTd = document.querySelectorAll('td')
     for (d of allTd){
         if (d.innerText != String.fromCharCode(160)){
@@ -134,4 +127,11 @@ async function delete_calendar_meal(user_id, id, date, meal_num){
     dateSplit = date.split('-')
     day = dateSplit[dateSplit.length - 1]
     $(`#meal_${meal_num}`).closest("li").remove()
+}
+
+
+//Adding Style
+if (window.location.pathname == '/'){
+    $('#container').removeClass('container')
+    $('#container').css("height", "100%")
 }

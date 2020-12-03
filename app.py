@@ -23,7 +23,7 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 connect_db(app)
 db.create_all()
 
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 def myconverter(obj):
    return f"{obj.year}-{obj.month}-{obj.day}"
@@ -237,7 +237,7 @@ def add_recipe(user_id, meal_id, meal_name):
             new_meal = Calendar(user_id=user_id, meal_id=meal_id, meal_name=meal_name, selected_date=form.date.data)
             db.session.add(new_meal)
             db.session.commit()
-            flash("Saved meal to calendar")
+            flash("Saved meal to calendar", "success")
             return redirect(f'/users/{user_id}/meals/{meal_id}/view/{meal_name}')
         else:
             return render_template('create_meal_calendar.html', form=form)
@@ -297,7 +297,7 @@ def add_todo(user_id):
         new_todo = List(user_id=user.id, item=request.json['ingredient'])
         db.session.add(new_todo)
         db.session.commit()
-        flash("Added to grocery list")
+        flash("Added to grocery list", "success")
         return redirect('/')
     else:
         return redirect('/')
@@ -378,7 +378,7 @@ def adding_saved_meal(user_id, meal_id, meal_name):
 
 @app.route('/users/<int:user_id>/saved-meals/<int:meal_id>/delete', methods=['POST'])
 def deleting_saved_meal(user_id, meal_id):
-    check_user_id = do_user_check(user_id)
+    check_user = do_user_check(user_id)
     if check_user:
         user = User.query.get_or_404(user_id)
         meal = Meal.query.filter(Meal.meal_id == meal_id, Meal.user_id == user_id).first()

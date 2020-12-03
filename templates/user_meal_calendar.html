@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {%block title%}Meal Calendar Page{%endblock%}
 {%block content%}
-<h1>This is the meal page for {{user.first_name}} {{user.last_name}}</h1>
+<h1 class="text-center">Meal Calendar</h1>
   <p style="display: none;">{{user.id}}</p>
   <div class="calendarDiv"></div>
-<a href="/users/{{g.user.id}}/add-meal">Add Meal</a>
+<p>Want to add your own meal? Click <a href="/users/{{g.user.id}}/add-meal">here</a></p>
 {%endblock%}
