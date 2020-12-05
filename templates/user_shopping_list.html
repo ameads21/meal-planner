@@ -23,13 +23,13 @@
     {%for todo in todo_list%}
     {%if todo.checked%}
     <li class="list-group-item">
-         <a class="btn btn-danger delete-todo float-right" data-id="{{todo.id}}" data-user="{{user.id}}">X</a>
+         <a class="btn btn-danger delete-todo float-right" data-id="{{todo.id}}" data-user="{{g.user['id']}}">X</a>
          <input type="checkbox" class="todo-item" checked>
          <span class="todo-text checked h3">{{todo.item}}</span>
         </li>
     {%else%}
     <li class="list-group-item">
-        <a class="btn btn-danger delete-todo float-right" data-id="{{todo.id}}" data-user="{{user.id}}">X</a>
+        <a class="btn btn-danger delete-todo float-right" data-id="{{todo.id}}" data-user="{{g.user['id']}}">X</a>
         <input type="checkbox" class="todo-item">
         <span class="todo-text h3">{{todo.item}}</span>
         </li>
@@ -38,6 +38,3 @@
 </div>
 
 {%endblock%}
-
-
-<!-- <li class="todo-item" data-id="{{todo.id}}" data-user="{{user.id}}">{{todo.item}} - <button class="delete-todo" data-id="{{todo.id}}" data-user="{{user.id}}">X</button></li> -->

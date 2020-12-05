@@ -2,7 +2,7 @@
 {%block title%}Meal Calendar Page{%endblock%}
 {%block content%}
 <h1 class="text-center">Meal Calendar</h1>
-  <p style="display: none;">{{user.id}}</p>
+  <p style="display: none;">{{g.user['id']}}</p>
   <div class="calendarDiv"></div>
 <p>Want to add your own meal? Click <a href="/users/{{g.user.id}}/add-meal">here</a></p>
 {%endblock%}

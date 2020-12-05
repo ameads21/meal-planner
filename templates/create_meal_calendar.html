@@ -15,7 +15,7 @@
         {%endfor%}
     </p>
     {%endfor%}
-    <a href="/users/{{user.id}}/meals/{{meal_id}}/view/{{meal_name}}" class="btn btn-primary">Back</a>
+    <a href="/users/{{g.user['id']}}/meals/{{meal_id}}/view/{{meal_name}}" class="btn btn-primary">Back</a>
     <button class="btn btn-success">Add</button>
 </form>
 {%endblock%}

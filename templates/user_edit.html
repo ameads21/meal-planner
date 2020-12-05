@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{%block title%}{{user.first_name}} {{user.last_name}}{%endblock%}
+{%block title%}{{g.user['first_name']}} {{g.user['last_name']}}{%endblock%}
 {%block content%}
 <h1>Hello World!</h1>
 <form method="POST">
@@ -15,7 +15,7 @@
         {%endfor%}
     </p>
     {%endfor%}
-    <a href="/users/{{user.id}}" class="btn btn-primary">Back</a>
+    <a href="/users/{{g.user['id']}}" class="btn btn-primary">Back</a>
     <button class="btn btn-success">Update</button>
 </form>
 {%endblock%}

@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {%block title%}Home Page{%endblock%}
 {%block content%}
-<h1>{{user.first_name}} {{user.last_name}}</h1>
+<h1>{{g.user['first_name']}} {{g.user['last_name']}}</h1>
 <p><b>Username</b></p>
-<p>{{user.username}}</p>
-<a href="/users/{{user.id}}/edit" class="btn btn-secondary">Edit</a>
+<p>{{g.user['username']}}</p>
+<a href="/users/{{g.user['id']}}/edit" class="btn btn-secondary">Edit</a>
 <a href="/logout" class="btn btn-primary">Logout</a>
-    <form action="/users/{{user.id}}/delete" method="POST" class="mt-5">
+    <form action="/users/{{g.user['id']}}/delete" method="POST" class="mt-5">
         <button class="btn btn-danger">Delete Account</button>
         </form>
 {%endblock%}

@@ -44,6 +44,27 @@ class User(db.Model):
             return False
 
 
+    @classmethod
+    def save(cls, user):
+        db.session.add(user)
+        db.session.commit()
+
+    @classmethod
+    def update(cls, user):
+        updated_user = User.query.get_or_404(user['id'])
+        updated_user.first_name = user['first_name']
+        updated_user.last_name = user['last_name']
+        updated_user.email = user['email']
+        db.session.add(updated_user)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, user): 
+        db.session.delete(user)
+        db.session.commit()
+
+
+
 class Meal(db.Model):
     __tablename__ = "meals"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -51,6 +72,16 @@ class Meal(db.Model):
     meal_id = db.Column(db.Integer, nullable=False)
     meal_name = db.Column(db.String, nullable=False)
     meal_image = db.Column(db.String, nullable=False)
+
+    @classmethod
+    def save(cls, meal):
+        db.session.add(meal)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, meal):
+        db.session.delete(meal)
+        db.session.commit()
 
 class List(db.Model):
 
@@ -60,6 +91,17 @@ class List(db.Model):
     item = db.Column(db.Text, nullable=False)
     checked = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
+    @classmethod
+    def save(cls, item):
+        db.session.add(item)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, item):
+        db.session.delete(item)
+        db.session.commit()
 
 class Calendar(db.Model):
 
@@ -72,3 +114,13 @@ class Calendar(db.Model):
     meal_id = db.Column(db.Integer)
     meal_name = db.Column(db.String, nullable=False)
     selected_date = db.Column(db.String, nullable=False)
+
+    @classmethod
+    def save(cls, meal):
+        db.session.add(meal)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, meal):
+        db.session.delete(meal)
+        db.session.commit()
