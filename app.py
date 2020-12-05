@@ -45,7 +45,9 @@ def do_login(user):
         "last_name": user.last_name,
         "email": user.email
     }
+
     session[CURR_USER] = data
+    g.user = session[CURR_USER]
 
 
 
