@@ -8,6 +8,7 @@ import json
 import datetime
 import requests
 import calendar
+from flask_sslify import SSLify
 
 CURR_USER = 'user'
 API_BASE_URL = "https://www.themealdb.com/api/json/v1/1"
@@ -23,6 +24,9 @@ connect_db(app)
 db.create_all()
 
 # toolbar = DebugToolbarExtension(app)
+
+if 'DYNO' in os.environ: # only trigger SSLify if the app is running on Heroku
+        sslify = SSLify(app)
 
 def myconverter(obj):
    return f"{obj.year}-{obj.month}-{obj.day}"
