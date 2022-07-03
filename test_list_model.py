@@ -1,16 +1,12 @@
 import os
 from unittest import TestCase
-
 from sqlalchemy import exc
-
-from models import Calendar, List, Meal, User, db
-
-os.environ["DATABASE_URL"] = "postgresql:///meal_planning_db_test"
+from models import db, User, Meal, List, Calendar
+os.environ['DATABASE_URL'] = 'postgresql:///meal_planning_db_test'
 
 from app import app
 
 db.create_all()
-
 
 class UserModelTestCase(TestCase):
     """Test views for messages"""
@@ -20,13 +16,7 @@ class UserModelTestCase(TestCase):
         db.drop_all()
         db.create_all()
 
-        u = User(
-            username="test1",
-            password="password",
-            first_name="John",
-            last_name="Doe",
-            email="email@email.com",
-        )
+        u = User(username="test1", password="password", first_name="John", last_name="Doe", email="email@email.com")
         uRegister = User.register(u)
         uid = 1111
         uRegister.id = uid
@@ -37,7 +27,7 @@ class UserModelTestCase(TestCase):
 
         db.session.add(uRegister)
         db.session.commit()
-
+        
         db.session.add(t)
         db.session.commit()
 
