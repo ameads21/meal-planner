@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: "fix:black"
+        entry: python -m black --target-version py38
+        language: system
+        files: \.py$
+        stages: [commit]
+      - id: isort
+        name: "fix:isort"
+        entry: python -m isort
+        language: system
+        files: \.py$
+        stages: [commit]
