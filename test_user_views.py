@@ -1,7 +1,6 @@
 import os
 from unittest import TestCase
-from models import db, User, Meal, List, Calendar
-from bs4 import BeautifulSoup
+from models import db, User, List
 
 os.environ['DATABASE_URL'] = 'postgresql:///meal_planning_db_test'
 
